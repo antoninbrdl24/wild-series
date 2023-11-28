@@ -7,4 +7,9 @@
 
 // any CSS you import will output into a single css file (app.css in this case)
 import './styles/app.css';
+// Importez Bootstrap CSS
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+// Importez Bootstrap JS (si nécessaire)
+import 'bootstrap/dist/js/bootstrap.bundle.min';
 console.log('Hello Webpack Encore !')
