@@ -12,8 +12,14 @@
     {% else %}
         Aucune catégorie trouvée.
     {% endfor %}
-
+    <div>
+    <a href="{{ path('program_new') }}">
+        Pour ajouter une nouvelle série
+    </a>
+    </div>
+    <div>
     <a href="{{ path('app_index') }}">
         Retour à l'accueil
     </a>
+    </div>
 {% endblock %}
