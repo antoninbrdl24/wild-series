@@ -56,7 +56,7 @@ class ProgramFixtures extends Fixture implements DependentFixtureInterface
         $program->setYear($newProgram['year']);
         $program->setCategory($this->getReference($newProgram['category_reference']));
         $manager->persist($program);
-        $this->addReference('program_' . str_replace(' ', '_', $newProgram['title']), $program);
+        $this->addReference('program_' . $newProgram['title'], $program);
 
         }
         $manager->flush();
@@ -69,6 +69,4 @@ class ProgramFixtures extends Fixture implements DependentFixtureInterface
           CategoryFixtures::class,
         ];
     }
-
-
 }

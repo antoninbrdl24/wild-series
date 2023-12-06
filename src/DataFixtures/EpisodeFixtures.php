@@ -7,35 +7,26 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
+use Faker\Factory;
+
 class EpisodeFixtures extends Fixture implements DependentFixtureInterface
 {
-    public CONST EPISODES = [
-        [
-            'number' => 1,
-            'title' => 'titre épisode 1',
-            'synopsis' => 'synopsis saison 1',
-            'season_reference' => 'season_program_Walking_Dead_1',
-        ],
-    ];
-
     public function load(ObjectManager $manager)
     {
-        foreach (EpisodeFixtures::EPISODES as $episodeData) {
-            $seasonReference = $episodeData['season_reference'];
-            $season = $this->getReference($seasonReference);
+        $faker = Factory::create();
 
-            for ($i = 1; $i <= 3; $i++) {
-                $episode = new Episode();
-                $episode->setTitle($episodeData['title']);
-                $episode->setNumber($i);
-                $episode->setSynopsis($episodeData['synopsis']);
-                $episode->setSeason($season);
-                $referenceName = sprintf('episode_%d_%d', $season->getNumber(),$i);
-                $this->setReference($referenceName, $episode);
-                $manager->persist($episode);
+        foreach (ProgramFixtures::PROGRAM as $program) {
+            for($i=1; $i<=SeasonFixtures::SEASONS; $i++){
+                for ($episodeNumber = 1; $episodeNumber <= 10; $episodeNumber++) {
+                    $episode = new Episode();
+                    $episode->setSeason($this->getReference('program_' . $program['title']. '_season'. $i));
+                    $episode->setTitle($faker->realText(10));
+                    $episode->setNumber($episodeNumber);
+                    $episode->setSynopsis($faker->realText(200));
+                    $manager->persist($episode);
+                }
             }
         }
-
         $manager->flush();
     }
 
