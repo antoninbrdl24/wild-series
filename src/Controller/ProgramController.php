@@ -39,7 +39,7 @@ class ProgramController extends AbstractController
         
         $form->handleRequest($request);
         // Was the form submitted ?
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($program);
             $entityManager->flush();            
     
@@ -98,6 +98,36 @@ class ProgramController extends AbstractController
             'season' => $season,
             'episode' => $episode,
         ]);
+    }
+    #[Route('/edit/{id<^[0-9]+$>}', name: 'edit')]
+    public function edit(Request $request, Program $program, EntityManagerInterface $entityManager): Response
+    {
+        $form = $this->createForm(ProgramType::class, $program);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+
+            $this->addFlash('success', 'The program has been edited successfully');
+
+            return $this->redirectToRoute('program_index');
+        }
+
+        return $this->render('program/edit.html.twig', [
+            'form' => $form->createView(),
+            'program' => $program,
+        ]);
+    }
+
+    #[Route('/delete/{id<^[0-9]+$>}', name: 'delete')]
+    public function delete(Program $program, EntityManagerInterface $entityManager): Response
+    {
+        $entityManager->remove($program);
+        $entityManager->flush();
+        $this->addFlash('danger', 'The program has been deleted successfully');
+
+        return $this->redirectToRoute('program_index');
     }
 
 }

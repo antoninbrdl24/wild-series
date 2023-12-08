@@ -17,5 +17,14 @@
         {{ include('include/_navbar.html.twig')}}
         {% endblock %}
         {% block body %}{% endblock %}
+        {% block message_flash %}
+            {% for type, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ type }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        {% endblock %}
     </body>
 </html>
