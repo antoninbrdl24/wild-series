@@ -15,7 +15,8 @@
                         <div class="media">
                             <img class="align-self-start mr-3" src="{{program.poster}}" alt="{{ program.title }} poster">
                             <div class="media-body">
-                                <h2 class="mt-0"><a href="{{ path('program_show', {'id': program.id}) }}">{{ program.title }}</a></h2>
+                                {{ dump(program.slug) }}
+                                <h2 class="mt-0"><a href="{{ path('program_show', {"slug": program.slug}) }}">{{ program.title }}</a></h2>
                                 <p> Référence de la série: {{ program.id }}</p>
                                 <p>{{ program.synopsis }}</p>
                             </div>

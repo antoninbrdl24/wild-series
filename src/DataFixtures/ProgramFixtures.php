@@ -6,9 +6,17 @@ use App\Entity\Program;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class ProgramFixtures extends Fixture implements DependentFixtureInterface
 {
+    protected $slugger;
+
+    public function __construct(SluggerInterface $slugger)
+    {
+        $this->slugger = $slugger;
+    }
+
     public CONST PROGRAM=[
         [
             'title' => 'Walking Dead',
@@ -46,6 +54,7 @@ class ProgramFixtures extends Fixture implements DependentFixtureInterface
             'category_reference' => 'category_Thriller',
         ]
     ];
+
     public function load(ObjectManager $manager)
     {
         foreach(self::PROGRAM as $newProgram){
@@ -55,7 +64,12 @@ class ProgramFixtures extends Fixture implements DependentFixtureInterface
         $program->setCountry($newProgram['country']);
         $program->setYear($newProgram['year']);
         $program->setCategory($this->getReference($newProgram['category_reference']));
+
+        $slug = $this->slugger->slug($program->getTitle());
+        $program->setSlug($slug);
+
         $manager->persist($program);
+
         $this->addReference('program_' . $newProgram['title'], $program);
 
         }

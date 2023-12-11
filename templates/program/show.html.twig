@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-Program {{ program.id }}
+Program {{ program.slug }}
 {% endblock %}
 
 {% block body %}
@@ -19,7 +19,7 @@ Program {{ program.id }}
     <ul>
         {% for season in program.seasons %}
             <li>
-                <a href="{{ path('program_season_show', {"program":program.id, "season": season.id }) }}">
+                <a href="{{ path('program_season_show', {programSlug:program.slug, seasonSlug: season.slug }) }}">
                     Saison {{ season.number }} - {{ season.description }}
                 </a>
             </li>

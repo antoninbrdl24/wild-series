@@ -9,7 +9,7 @@
     <ul>
         {% for program in actor.programs %}
             <li>{{ program.title }}</li>
-            <a href="{{ path('program_show', {'id': program.id}) }}">Voir la fiche de cette série </a>
+            <a href="{{ path('program_show', {'slug': program.slug}) }}">Voir la fiche de cette série </a>
         {% endfor %}
     </ul>
 {% endblock %}

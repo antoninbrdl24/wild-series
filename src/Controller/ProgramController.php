@@ -11,9 +11,13 @@ use App\Entity\Program;
 use App\Entity\Season;
 use App\Entity\Episode;
 use App\Entity\Category;
+use App\service\ProgramDuration;
 use App\Form\ProgramType;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use App\Repository\CategoryRepository;
 use App\Repository\ProgramRepository;
+use App\Repository\SeasonRepository;
+use App\Repository\EpisodeRepository;
 
 #[Route('/program', name: 'program_')]
 class ProgramController extends AbstractController
@@ -30,7 +34,7 @@ class ProgramController extends AbstractController
         }
     
     #[Route('/new', name: 'new')]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger,  ProgramDuration $programDuration): Response
     {
         $program = new Program();
 
@@ -40,6 +44,8 @@ class ProgramController extends AbstractController
         $form->handleRequest($request);
         // Was the form submitted ?
         if ($form->isSubmitted() && $form->isValid()) {
+            $slug = $slugger->slug($program->getTitle());
+            $program->setSlug($slug); 
             $entityManager->persist($program);
             $entityManager->flush();            
     
@@ -49,10 +55,12 @@ class ProgramController extends AbstractController
 
         return $this->render('program/new.html.twig', [
             'form' => $form,
+            'programDuration' => $programDuration->calculate($program)
         ]);
     }
-    #[Route('/show/{id<^[0-9]+$>}', name: 'show')]
-    public function show(Program $program):Response
+    #[Route('/show/{slug}', name: 'show')]
+    public function show( 
+        #[MapEntity(mapping:['slug'=>'slug'])] Program $program): Response
     {
         if (!$program) {
             throw $this->createNotFoundException(
@@ -63,9 +71,12 @@ class ProgramController extends AbstractController
             'program' => $program
         ]);
     }
-    #[Route('{program}/season/{season}', name: 'season_show')]
-    public function showSeason(Program $program, Season $season): Response
-    {
+    #[Route('/{programSlug}/season/{seasonSlug}', name: 'season_show')]
+    public function showSeason( $programSlug, ProgramRepository $programRepository, $seasonSlug, SeasonRepository $seasonRepository) : Response
+    {   
+        $program = $programRepository->findOneBy(['slug' => $programSlug]);
+        $season=$seasonRepository->findOneBy(['slug'=>$seasonSlug]);
+        
         if (!$program) {
             throw $this->createNotFoundException('Program not found');
         }
@@ -80,8 +91,13 @@ class ProgramController extends AbstractController
         ]);
     }
 
-    #[Route('{program}/season/{season}/episode/{episode}', name: 'episode_show')]
-    public function showEpisode(Program $program, Season $season, Episode $episode){
+    #[Route('/{programSlug}/season/{seasonSlug}/episode/{episodeSlug}', name: 'episode_show')]
+    public function showEpisode(
+         $programSlug, ProgramRepository $programRepository, $seasonSlug, SeasonRepository $seasonRepository, $episodeSlug, EpisodeRepository $episodeRepository):Response
+        {
+            $program = $programRepository->findOneBy(['slug' => $programSlug]);
+            $season=$seasonRepository->findOneBy(['slug'=>$seasonSlug]);
+            $episode=$episodeRepository->findOneBy(['slug'=>$episodeSlug]);
         if (!$program) {
             throw $this->createNotFoundException('Program not found');
         }
@@ -99,14 +115,18 @@ class ProgramController extends AbstractController
             'episode' => $episode,
         ]);
     }
-    #[Route('/edit/{id<^[0-9]+$>}', name: 'edit')]
-    public function edit(Request $request, Program $program, EntityManagerInterface $entityManager): Response
+    #[Route('/edit/{slug}', name: 'edit')]
+    public function edit(Request $request, Program $program, SluggerInterface $slugger, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(ProgramType::class, $program);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            
+            $slug = $slugger->slug($program->getTitle());
+            $program->setSlug($slug); 
+
             $entityManager->flush();
 
             $this->addFlash('success', 'The program has been edited successfully');
