@@ -13,6 +13,7 @@ Program {{ program.slug }}
             <p>Catégorie : {{ program.category.name }}</p>
             <p>Pays : {{ program.country }}</p>
             <p>Année : {{ program.year }}</p>
+            <p>Durée totale de la série : {{ programDuration }}</p>
         </div>
     </div>
     <h2>Saisons</h2>
@@ -24,6 +25,7 @@ Program {{ program.slug }}
                 </a>
             </li>
         {% endfor %}
+         <a href="{{ path('app_season_new') }}">Créer une nouvelle saison</a>
     </ul>
     <h2>Acteurs :</h2>
     <ul>

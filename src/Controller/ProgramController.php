@@ -60,7 +60,7 @@ class ProgramController extends AbstractController
     }
     #[Route('/show/{slug}', name: 'show')]
     public function show( 
-        #[MapEntity(mapping:['slug'=>'slug'])] Program $program): Response
+        #[MapEntity(mapping:['slug'=>'slug'])] Program $program, ProgramDuration $programDuration): Response
     {
         if (!$program) {
             throw $this->createNotFoundException(
@@ -68,7 +68,8 @@ class ProgramController extends AbstractController
             );
         }
         return $this->render('program/show.html.twig', [
-            'program' => $program
+            'program' => $program,
+            'programDuration' => $programDuration->calculate($program),
         ]);
     }
     #[Route('/{programSlug}/season/{seasonSlug}', name: 'season_show')]
