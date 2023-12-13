@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,6 +19,7 @@ use App\Repository\CategoryRepository;
 use App\Repository\ProgramRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\EpisodeRepository;
+use Symfony\Component\Mailer\MailerInterface;
 
 #[Route('/program', name: 'program_')]
 class ProgramController extends AbstractController
@@ -34,7 +36,7 @@ class ProgramController extends AbstractController
         }
     
     #[Route('/new', name: 'new')]
-    public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger,  ProgramDuration $programDuration): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer, SluggerInterface $slugger,  ProgramDuration $programDuration): Response
     {
         $program = new Program();
 
@@ -48,7 +50,14 @@ class ProgramController extends AbstractController
             $program->setSlug($slug); 
             $entityManager->persist($program);
             $entityManager->flush();            
-    
+            
+            $email = (new Email())
+            ->from($this->getParameter('mailer_from'))
+            ->to('antonin.brondel24@gmail.com')
+            ->subject('Une nouvelle série vient d\'être publiée !')
+            ->html($this->renderView('Program/newProgramEmail.html.twig', ['program' => $program]));
+
+            $mailer->send($email);
             // Redirect to categories list
             return $this->redirectToRoute('program_index');
         }
@@ -76,7 +85,7 @@ class ProgramController extends AbstractController
     public function showSeason( $programSlug, ProgramRepository $programRepository, $seasonSlug, SeasonRepository $seasonRepository) : Response
     {   
         $program = $programRepository->findOneBy(['slug' => $programSlug]);
-        $season=$seasonRepository->findOneBy(['slug'=>$seasonSlug]);
+        $season = $seasonRepository->findOneBy(['slug'=>$seasonSlug]);
         
         if (!$program) {
             throw $this->createNotFoundException('Program not found');

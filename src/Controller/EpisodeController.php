@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Episode;
 use App\Form\EpisodeType;
+use Symfony\Component\Mime\Email;
 use App\Repository\EpisodeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use App\service\ProgramDuration;
+use Symfony\Component\Mailer\MailerInterface;
 
 #[Route('/episode')]
 class EpisodeController extends AbstractController
@@ -25,7 +27,7 @@ class EpisodeController extends AbstractController
     }
 
     #[Route('/new', name: 'app_episode_new', methods: ['GET', 'POST'], )]
-    public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger,  ProgramDuration $programDuration): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,  SluggerInterface $slugger,  ProgramDuration $programDuration): Response
     {
         $episode = new Episode();
 
@@ -38,7 +40,16 @@ class EpisodeController extends AbstractController
             $entityManager->persist($episode);
             $entityManager->flush();
 
-            $this->addFlash('success', 'The new program has been created');
+             
+            $email = (new Email())
+            ->from($this->getParameter('mailer_from'))
+            ->to('antonin.brondel24@gmail.com')
+            ->subject('Un nouvel épisode vient d\'être publiée !')
+            ->html($this->renderView('Episode/newEpisodeEmail.html.twig', ['episode' => $episode]));
+
+            $mailer->send($email);
+
+            $this->addFlash('success', 'The new episode has been created');
 
             return $this->redirectToRoute('app_episode_index', [], Response::HTTP_SEE_OTHER);
         }
