@@ -48,6 +48,11 @@ class ProgramController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $slug = $slugger->slug($program->getTitle());
             $program->setSlug($slug); 
+            $posterFile = $form->get('posterFile')->getData();
+            if ($posterFile) {
+                $program->setPosterFile($posterFile);
+            }
+
             $entityManager->persist($program);
             $entityManager->flush();            
             
