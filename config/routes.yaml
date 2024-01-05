@@ -6,3 +6,6 @@ controllers:
 app_logout:
     path: /logout
     controller: App\Controller\LogoutController::logout
+delete_comment:
+    path: '/comment/{id}/delete'
+    controller: 'App\Controller\CommentController::deleteComment'

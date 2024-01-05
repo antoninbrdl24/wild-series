@@ -76,6 +76,9 @@ class Program
     )]
     private ?File $posterFile = null;
 
+    #[ORM\ManyToOne(inversedBy: 'programs')]
+    private ?User $owner = null;
+
     public function __construct()
     {
         $this->seasons = new ArrayCollection();
@@ -272,6 +275,18 @@ class Program
     public function setUpdatedAt($updatedAt)
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
 
         return $this;
     }

@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Program;
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -57,12 +58,15 @@ class ProgramFixtures extends Fixture implements DependentFixtureInterface
 
     public function load(ObjectManager $manager)
     {
+        $admin = $this->getReference('admin');
+
         foreach(self::PROGRAM as $newProgram){
         $program = new Program();
         $program->setTitle($newProgram['title']);
         $program->setSynopsis($newProgram['synopsis']);
         $program->setCountry($newProgram['country']);
         $program->setYear($newProgram['year']);
+        $program->setOwner($admin);
         $program->setCategory($this->getReference($newProgram['category_reference']));
 
         $slug = $this->slugger->slug($program->getTitle());

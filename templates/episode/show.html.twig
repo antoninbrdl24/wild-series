@@ -33,6 +33,15 @@
                 {{ comment.rate }} / 5 
                 <p> {{ comment.comment }} </p>
                 <p>Par {{ comment.author.email }} le {{ comment.createdAt|date('d/m/Y H:i') }}</p>
+                {% if is_granted('ROLE_ADMIN') %}
+                    {# Afficher le bouton de suppression pour les administrateurs pour tous les commentaires #}
+                    <a href="{{ path('comment_delete', {'id': comment.id}) }}">Supprimer</a>
+                {% elseif is_granted('ROLE_CONTRIBUTOR') and comment.author == app.user %}
+                    {# Afficher le bouton de suppression pour les contributeurs uniquement s'ils sont auteurs du commentaire #}
+                    <a href="{{ path('comment_delete', {'id': comment.id}) }}">Supprimer</a>
+                {% endif %}
+                {{ dump(comment.author)}}
+                {{ dump(app.user)}}
             </li>
         {% endfor %}
     </ul>
@@ -61,6 +70,4 @@
 
     {% endif %}
    
-
-    {{ include('episode/_delete_form.html.twig') }}
 {% endblock %}

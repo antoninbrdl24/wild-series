@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use App\service\ProgramDuration;
 use Symfony\Component\Mailer\MailerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 #[Route('/episode')]
 class EpisodeController extends AbstractController
@@ -30,8 +31,10 @@ class EpisodeController extends AbstractController
     }
 
     #[Route('/new', name: 'app_episode_new', methods: ['GET', 'POST'], )]
+    #[IsGranted('ROLE_CONTRIBUTOR')]
     public function new(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,  SluggerInterface $slugger,  ProgramDuration $programDuration): Response
     {
+
         $episode = new Episode();
 
         $form = $this->createForm(EpisodeType::class, $episode);
@@ -100,7 +103,8 @@ class EpisodeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $episodde->setTitle($episode->getTitle(), $slugger);
+            $slug = $slugger->slug($episode->getNumber());
+            $episode->setSlug($slug);
             $entityManager->flush();
 
             $this->addFlash('success', 'The episode has been edited successfully');
@@ -117,6 +121,8 @@ class EpisodeController extends AbstractController
     #[Route('/{id}', name: 'app_episode_delete', methods: ['POST'])]
     public function delete(Request $request, Episode $episode, EntityManagerInterface $entityManager): Response
     {
+        $submittedToken = $request->request->get('_token');
+        var_dump($submittedToken);
         if ($this->isCsrfTokenValid('delete'.$episode->getId(), $request->request->get('_token'))) {
             $entityManager->remove($episode);
             $entityManager->flush();
