@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello ProfileController!{% endblock %}
+
+{% block body %}
+{{dump(user)}}
+    <div class="mx-sm-4">
+    <h2>Mon compte</h2>
+    <p>Adresse e-mail : {{ user.email }}</p>
+    <p><a href="{{ path('app_forgot_password_request') }}">Mot de passe oublié</a></p>
+    </div>
+{% endblock %}

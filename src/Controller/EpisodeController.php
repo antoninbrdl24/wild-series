@@ -118,7 +118,7 @@ class EpisodeController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_episode_delete', methods: ['POST'])]
+    #[Route('/{id}/delete', name: 'app_episode_delete', methods: ['POST'])]
     public function delete(Request $request, Episode $episode, EntityManagerInterface $entityManager): Response
     {
         $submittedToken = $request->request->get('_token');

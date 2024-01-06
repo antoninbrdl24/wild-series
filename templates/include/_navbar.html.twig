@@ -4,7 +4,7 @@
   </a>
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
    {% if app.user %}
-    {{ app.user.email }}
+    <a href="{{ path('app_my_profile') }}">Mon compte</a>
     <a class="px-2" href="{{ path('app_logout') }}"> Se déconnecter</a>
 {% else %}
     <a href="{{ path('app_login') }}"> Se connecter</a>

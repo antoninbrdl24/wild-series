@@ -9,3 +9,6 @@ app_logout:
 delete_comment:
     path: '/comment/{id}/delete'
     controller: 'App\Controller\CommentController::deleteComment'
+app_my_profile:
+    path: '/my-profile'
+    controller: 'App\Controller\ProfileController::index'
